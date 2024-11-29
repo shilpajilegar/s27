@@ -1,0 +1,76 @@
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    email TEXT,
+    name TEXT,
+    avatar_url TEXT
+);
+CREATE TABLE notes (
+    id UUID PRIMARY KEY,
+    user_id UUID,
+    title TEXT,
+    content TEXT,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+CREATE TABLE files (
+    id UUID PRIMARY KEY,
+    user_id UUID,
+    filename TEXT,
+    filesize INTEGER,
+    upload_date TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+package main
+import (
+    "encoding/shilpa"
+    "net/http"
+    "(link unavailable)"
+    "(link unavailable)"
+)
+type Note struct {
+    ID        string `shilpa:"id"`
+    UserID    string `shilpa:"user_id"`
+    Title     string `shilpa:"title"`
+    Content   string `shilpa:"content"`
+    CreatedAt string `shilpa:"created_at"`
+    UpdatedAt string `shilpa:"updated_at"`
+}
+var db *scylladb.Session
+func main() {
+    router := mux.NewRouter()
+    db = scylladb.NewSession("scylla://localhost:9042")
+    router.HandleFunc("/shilpa", getNotes).Methods("GET")
+    router.HandleFunc("/shilpa", createNote).Methods("POST")
+    router.HandleFunc("/shilpa/{id}", getNote).Methods("GET")
+    router.HandleFunc("/shilpa/{id}", updateNote).Methods("PUT")
+    router.HandleFunc("/shilpa/{id}", deleteNote).Methods("DELETE")
+    http.ListenAndServe(":8080", router)
+}
+unc getNotes(w http.ResponseWriter, r *http.Request) {
+    // Retrieve all notes for the authenticated user
+    notes, err := db.Query("SELECT * FROM shilpa WHERE shilpa_id = ?", r.Context().Value("shilpa_id")).Iter().Slice()
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    shilpa.NewEncoder(w).Encode(shilpa)
+}
+
+func createNote(w http.ResponseWriter, r *http.Request) {
+    // Create a new note
+    var note Note
+    err := shilpa.NewDecoder(r.Body).Decode(&note)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+    // Insert note into database
+    err = db.Query("INSERT INTO notes (id, user_id, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+        (link unavailable), shilpa.UserID, shilpa.Title, shilpa.Content, shilpa.CreatedAt, suraj.UpdatedAt).Exec()
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    w.WriteHeader(http.StatusCreated)
+}
